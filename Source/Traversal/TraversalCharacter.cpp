@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+
 #include "InputActionValue.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -49,6 +50,8 @@ ATraversalCharacter::ATraversalCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -126,4 +129,34 @@ void ATraversalCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+ void ATraversalCharacter::BeginPlay() {
+	 Super::BeginPlay();
+	 if (AbilitySystemComponent) {
+		 AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(MantleAbility, 1));
+		 AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(VaultAbility, 1));
+	 }
+
+}
+
+
+UAbilitySystemComponent* ATraversalCharacter::GetAbilitySystemComponent() const {
+	return AbilitySystemComponent;
+}
+
+void ATraversalCharacter::Vault() {
+	if (!AbilitySystemComponent) {
+		UE_LOG(LogTemp, Warning, TEXT("[TraversalCharacter] Error AbilitySystemComponent "));
+		return;
+	}
+	AbilitySystemComponent->TryActivateAbilityByClass(VaultAbility);
+}
+
+void ATraversalCharacter::Mantle() {
+	if (!AbilitySystemComponent) {
+		UE_LOG(LogTemp, Warning, TEXT("[TraversalCharacter] Error AbilitySystemComponent "));
+		return;
+	}
+	AbilitySystemComponent->TryActivateAbilityByClass(MantleAbility);
+
 }

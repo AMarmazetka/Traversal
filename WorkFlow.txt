@@ -1,0 +1,162 @@
+-----------------------------------------------------------------------------------------------------------------------------------
+Experiments
+1) step1
+Setup WorkPlace UE 5.5, my
+Check how work GAS
+
+scetch arch:
+Player->InputKey(E)->UAbilitySystemComponent->GA_Vault && GA_Mantle-> ChooseAnimation -> MaybeNeedAceragedAnimation
+     |                        |                              |
+   GetSpeed               NeedLearn               Trace -> GetActorBarrier -> GetHight && AvailableSpace
+ Run Or Walk                                                   |
+                                           IsTraversal-> Interface (Contract) Or ParrentClass
+
+
+PS InputKey on Bigspeed looks strange, When Player run He doesn't think about keys, He looks arround 
+
+
+I saw only 4 animation in folder.
+Traversal
+   |       |
+   H       S
+
+
+Hight->Hight           Speed->Slow 
+|                       |
+Medium                 Fast
+++++++++++++++
+2) Step 2
+-Inisialization:
+Player : public IAbilitySystemInterface
+virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+UAbilitySystemComponent* AbilitySystemComponent;
+GiveAbility(GA_Vaulting, GA_Mantling)
+
+-Strating Flow:
+Player-> PushKey-> Trace-> GetBlockActor-> IsBlock from Interface -> GetInfoAboutWorld(height, speed)-> ActivateAbility
+
+-AnotherMethod:
+Player-> PushKey-> Trace-> GetBlockActor-> IsBlock from Interface -> GetInfoAboutWorld(height, speed)->Gameplay Event with GameplayEventData??? 
+I take This
+
+3) Step3
+Ivailables and Parametrs:
+The Player is moving and appraching to Block. He is pressing "E" but what cann't give make it GA. 
+-Available(It's not interactive object) dont active
+-Distance(You close for trace and press button, but you doon't close for make GA), You maybe can get distance directly activateGA and rotator, Character can rotate to another turn. Hmm GA? or Pre GA
+-Hight so big(GA)
+-AvailableSpaceOnTheTop (Just valid about)
+
+Paravetrs: 
+Execution IsValid
+Isinterface
+Execution Distance
+**Distance (PreGA) MaybeOverlap? And JustEvent OverEngineer?
+Execution Angle/Cone
+**Cone (PreGA)
+Execution Speed
+**SpeedCharacter (GiveToGA)
+
+Trace:
+==Height. You can search it in trace, but for first step GetStaticMeshComponent and GetBounds.getZ*2. is that true Hight?
+Trace to Find Object
+Trace to Find Height
+ps GAS have GameplayAbilityTarget_Trace But it's not what i need, player don't need apply something
+
+
+DataAsset (What important for GameDesigner):
+Height choosen animation
+Speed Choosen animation
+Distance
+Choosen Animation (For Changes)
+
+RootMotion
+It's Active ok
+In Task you Start Animation FVector TargetLocation = EventData->TargetData
+But plugin Motion Warping it's one more theme for learning-> time idk
+
+AdditionalInformation
+It have really many parametrs, I think I have really a few time:
+an obstacle located below the trace
+there are numerous checks for climbing accessibility; for example, another factor is whether there is clear space above one's head, rather than just a ledge.
+Will I be have time for interpolate animation? 
+Check how many Ability can apply on this type objects from this interface
+ResetAnimation if player dont want go to top
+
+-----------------------------------------------------------------------------------------------------------------------------------
+Invariants
+####ModuleGas
+-Ability finish always with EndAbility() - (Exm: Activate->PlayMontage-> OnCompleted->EndPlay)
+-Ability never use isn't Valid Actor (IsValid())
+-GameplayEffects only for States. Nothing gameplay logic. Use it only if GAs states interacts among themself (If I will be use that class)
+-CommitAbility for atomicity (It does not need for this testwork (I haven't energy or some other parametrs for realization GA), but it's important practical)
+-Don't check only OnCopleted. Check other delegates for return Ability in ValidState
+-MovementComponent answer for Jumping, walk and other. GameplayEffect don't influence on this
+
+####ModuleObjects
+-Not all BlocksObjects is for Ability(Use Interface and contract)
+
+####ModuleAnimation
+-Use only 4 animations maybe I need transitional for flow
+
+####Delegates
+-Don't forgot EndPlay
+-----------------------------------------------------------------------------------------------------------------------------------
+Arch
+                INPUT E
+                     │
+                     ▼
+              PRE-GA DETECTION
+                     │
+             Forward Trace
+                     │
+                     ▼
+              Hit Actor?
+                /       \
+              No         Yes
+              │           │
+            return   Implements
+                    Traversal Interface?
+                         │
+                         ▼
+                   GetTraversalData
+                         │
+              ┌──────────┼───────────┐
+              │          │           │
+           Height    TargetLocation  ...
+              │
+              ▼
+         Select Ability
+          /           \
+     GA_Vault       GA_Mantle
+         │              │
+         └──────┬───────┘
+                │
+           Get Speed
+                │
+                ▼
+         Select Animation
+                │
+                ▼
+          Play Montage
+                │
+                ▼
+        Movement / Root Motion
+                │
+                ▼
+            EndAbility
+-----------------------------------------------------------------------------------------------------------------------------------
+IMPL
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------
+Edge
+###Pre IMPL:
+-It have really many parametrs, I think I have really a few time:
+-an obstacle located below the trace
+-there are numerous checks for climbing accessibility; for example, another factor is whether there is clear space above one's head, rather than just a ledge.
+-Will I be have time for interpolate animation? 
+-Check how many Ability can apply on this type objects from this interface
+-ResetAnimation if player dont want go to top

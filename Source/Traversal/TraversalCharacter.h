@@ -5,6 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "AbilitySystemInterface.h"
+#include "AbilitySystemComponent.h"
+#include "GameAbilities/GA_Mantle.h"
+#include "GameAbilities/GA_Vault.h"
 #include "TraversalCharacter.generated.h"
 
 class USpringArmComponent;
@@ -16,7 +20,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class ATraversalCharacter : public ACharacter
+class ATraversalCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -43,6 +47,10 @@ class ATraversalCharacter : public ACharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
+	
+
+
+	
 
 public:
 	ATraversalCharacter();
@@ -63,10 +71,33 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	
+
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	UPROPERTY(EditDefaultsOnly, Category = "GAS")
+	TSubclassOf<UGameplayAbility> VaultAbility;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GAS")
+	TSubclassOf<UGameplayAbility> MantleAbility;
+	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	virtual void BeginPlay() override;
+
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	UFUNCTION(BlueprintCallable)
+	void Vault();
+	UFUNCTION(BlueprintCallable)
+	void Mantle();
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+
 };
 
