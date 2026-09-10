@@ -47,14 +47,16 @@ class ATraversalCharacter : public ACharacter, public IAbilitySystemInterface
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* TraversalAction;
 
 
 	
 
 public:
 	ATraversalCharacter();
-	
+	virtual void BeginPlay() override;
 
 protected:
 
@@ -63,6 +65,10 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	void Travers(const FInputActionValue& Value);
+
+	bool FindTriversalObject();
 			
 
 protected:
@@ -71,7 +77,7 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 
 public:
@@ -82,8 +88,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GAS")
 	TSubclassOf<UGameplayAbility> MantleAbility;
-	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
+	float DistanceInputAction;
+	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
+	float DistanceActivateAbility;
+
+
 
 
 	/** Returns CameraBoom subobject **/
@@ -96,7 +107,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Mantle();
 
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 
 
 };

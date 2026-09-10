@@ -9,7 +9,8 @@
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "TraversalObject.h"
+#include "TraversalObjects.h"
 #include "InputActionValue.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -52,7 +53,6 @@ ATraversalCharacter::ATraversalCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -88,6 +88,8 @@ void ATraversalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATraversalCharacter::Look);
+
+		EnhancedInputComponent->BindAction(TraversalAction, ETriggerEvent::Started, this, &ATraversalCharacter::Travers);
 	}
 	else
 	{
@@ -130,21 +132,37 @@ void ATraversalCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
- void ATraversalCharacter::BeginPlay() {
-	 Super::BeginPlay();
-	 if (AbilitySystemComponent) {
-		 AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(MantleAbility, 1));
-		 AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(VaultAbility, 1));
-	 }
 
+void ATraversalCharacter::Travers(const FInputActionValue& Value) {
+	if (FindTriversalObject()) {
+		Vault();
+		Mantle();
+	}
 }
 
+ void ATraversalCharacter::BeginPlay() {
+	 Super::BeginPlay();
+
+	 UE_LOG(LogTemp, Warning,
+		 TEXT("=== BEGIN PLAY ==="));
+
+	 if (AbilitySystemComponent) {
+		UE_LOG(LogTemp, Warning, TEXT("[TraversalCharacter] TrytoGiveAbility "));
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(MantleAbility, 1, -1));
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(VaultAbility, 1, -1));
+	 }
+}
 
 UAbilitySystemComponent* ATraversalCharacter::GetAbilitySystemComponent() const {
 	return AbilitySystemComponent;
 }
 
 void ATraversalCharacter::Vault() {
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("=== VAULT INPUT ==="));
+
 	if (!AbilitySystemComponent) {
 		UE_LOG(LogTemp, Warning, TEXT("[TraversalCharacter] Error AbilitySystemComponent "));
 		return;
@@ -159,4 +177,27 @@ void ATraversalCharacter::Mantle() {
 	}
 	AbilitySystemComponent->TryActivateAbilityByClass(MantleAbility);
 
+}
+
+bool ATraversalCharacter::FindTriversalObject() {
+	const FVector StartPoint = GetActorLocation();
+	const FVector ForwardVector = GetActorForwardVector();
+	const FVector EndPoint = StartPoint + ForwardVector * DistanceInputAction;
+	FHitResult HitRes;
+	FCollisionQueryParams IgnorCharacter;
+	IgnorCharacter.AddIgnoredActor(this);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitRes, StartPoint, EndPoint, ECC_Visibility,IgnorCharacter);
+
+	if (!bHit || !HitRes.GetActor()) {
+		UE_LOG(LogTemp, Warning, TEXT("NothingHit or InvalidActor"));
+		return false;
+	}
+	AActor* HitActor = HitRes.GetActor();
+
+
+	if (HitActor->Implements<UTraversalObjects>()) {
+		return true;
+	}
+
+	return false;
 }

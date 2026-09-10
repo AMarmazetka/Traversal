@@ -85,6 +85,12 @@ Check how many Ability can apply on this type objects from this interface
 ResetAnimation if player dont want go to top
 
 -----------------------------------------------------------------------------------------------------------------------------------
+Choose Practic:
+TraceLine and Hit Verified before (Another Available Box and Sphere Trace, I don't use before, Time, I saw Trace from Ability system maybe it will be work, but I think it for shoot)
+Implements verified before a many time (Another available Collision, OnlyParentClass, Tags, SetsOfData(it's cool very dynamic and usefull, but time))
+
+
+-----------------------------------------------------------------------------------------------------------------------------------
 Invariants
 ####ModuleGas
 -Ability finish always with EndAbility() - (Exm: Activate->PlayMontage-> OnCompleted->EndPlay)
@@ -104,20 +110,20 @@ Invariants
 -Don't forgot EndPlay
 -----------------------------------------------------------------------------------------------------------------------------------
 Arch
-                INPUT E
+                INPUT E ok
                      │
                      ▼
               PRE-GA DETECTION
                      │
-             Forward Trace
+             Forward Trace ok
                      │
                      ▼
-              Hit Actor?
+              Hit Actor? ok
                 /       \
               No         Yes
               │           │
-            return   Implements
-                    Traversal Interface?
+         ok   return   Implements ok
+                    Traversal Interface? ok
                          │
                          ▼
                    GetTraversalData
@@ -148,7 +154,12 @@ Arch
             EndAbility
 -----------------------------------------------------------------------------------------------------------------------------------
 IMPL
-
+Step1 try testing GAS:
+BeginPlay() - GiveAbilities (C++)
+Vault()&Mantle() - function apply abilities
+Step2:
+Travers(const FInputActionValue& Value) - function realize input "E"
+FindTriversalObject() - Used Trace for Find Objects, return true if actor implements TraversalObjets and activate Vault and Mantle
 
 
 -----------------------------------------------------------------------------------------------------------------------------------
@@ -160,3 +171,6 @@ Edge
 -Will I be have time for interpolate animation? 
 -Check how many Ability can apply on this type objects from this interface
 -ResetAnimation if player dont want go to top
+###InIMPL:
+-has GAS server? If you try apply Abilities in BeginPlay in BP, It can apply firster that C++ code (strange but fact)  
+
