@@ -126,32 +126,32 @@ Arch
                     Traversal Interface? ok
                          │
                          ▼
-                   GetTraversalData
+                   GetTraversalData 
                          │
               ┌──────────┼───────────┐
               │          │           │
-           Height    TargetLocation  ...
+           Height ok   TargetLocation  ...
               │
               ▼
-         Select Ability
+         Select Ability ok
           /           \
-     GA_Vault       GA_Mantle
+     GA_Vault       GA_Mantle ok
          │              │
          └──────┬───────┘
                 │
            Get Speed
                 │
                 ▼
-         Select Animation
+         Select Animation ok
                 │
                 ▼
-          Play Montage
+          Play Montage ok
                 │
                 ▼
-        Movement / Root Motion
+        Movement ok / MotionWarping / Root Motion ok
                 │
                 ▼
-            EndAbility
+            EndAbility ok
 -----------------------------------------------------------------------------------------------------------------------------------
 IMPL
 Step1 try testing GAS:
@@ -160,7 +160,10 @@ Vault()&Mantle() - function apply abilities
 Step2:
 Travers(const FInputActionValue& Value) - function realize input "E"
 FindTriversalObject() - Used Trace for Find Objects, return true if actor implements TraversalObjets and activate Vault and Mantle
-
+FindHeightTargetActor(FHitResult HitRes) - finding HeightObject and return this
+Step3:
+void UGA_Mantle::ActivateAbility = created Montage for playAnimation. Animation is Work, But don't work Root  
+Fixed Root Motion. Z work too. All works make. Next I need to make extension and impruve 
 
 -----------------------------------------------------------------------------------------------------------------------------------
 Edge
@@ -173,4 +176,5 @@ Edge
 -ResetAnimation if player dont want go to top
 ###InIMPL:
 -has GAS server? If you try apply Abilities in BeginPlay in BP, It can apply firster that C++ code (strange but fact)  
+-Z need off Mode_Walking because CHaracter always snap on floor, apply Mode_Fly and return standart mode after animation
 

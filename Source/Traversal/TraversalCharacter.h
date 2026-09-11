@@ -68,7 +68,8 @@ protected:
 
 	void Travers(const FInputActionValue& Value);
 
-	bool FindTriversalObject();
+	float FindTriversalObject();
+	float FindHeightTargetActor(FHitResult HitResult);
 			
 
 protected:
@@ -93,7 +94,10 @@ public:
 	float DistanceInputAction;
 	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
 	float DistanceActivateAbility;
-
+	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
+	float HeightVaulting;
+	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
+	float HeightMantling;
 
 
 
@@ -106,8 +110,6 @@ public:
 	void Vault();
 	UFUNCTION(BlueprintCallable)
 	void Mantle();
-
-
 
 
 };

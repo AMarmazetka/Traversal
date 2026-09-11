@@ -134,9 +134,17 @@ void ATraversalCharacter::Look(const FInputActionValue& Value)
 }
 
 void ATraversalCharacter::Travers(const FInputActionValue& Value) {
-	if (FindTriversalObject()) {
-		Vault();
-		Mantle();
+	float HeightActor = FindTriversalObject();
+	if (!HeightActor == 0) {
+		if (HeightActor >= HeightVaulting){
+			Mantle();
+			}
+		if (HeightActor < HeightVaulting) {
+			Vault();
+		}
+		if (HeightActor > HeightMantling) {
+			UE_LOG(LogTemp, Warning, TEXT("[TraversalCharacter] VeryHeight"));
+		}
 	}
 }
 
@@ -179,25 +187,57 @@ void ATraversalCharacter::Mantle() {
 
 }
 
-bool ATraversalCharacter::FindTriversalObject() {
+float ATraversalCharacter::FindTriversalObject() {
+	float Height = 0;
 	const FVector StartPoint = GetActorLocation();
 	const FVector ForwardVector = GetActorForwardVector();
 	const FVector EndPoint = StartPoint + ForwardVector * DistanceInputAction;
 	FHitResult HitRes;
 	FCollisionQueryParams IgnorCharacter;
 	IgnorCharacter.AddIgnoredActor(this);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitRes, StartPoint, EndPoint, ECC_Visibility,IgnorCharacter);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitRes, StartPoint, EndPoint, ECC_Visibility, IgnorCharacter);
 
 	if (!bHit || !HitRes.GetActor()) {
-		UE_LOG(LogTemp, Warning, TEXT("NothingHit or InvalidActor"));
-		return false;
+		UE_LOG(LogTemp, Warning, TEXT("[TraversalCharacter] NothingHit or InvalidActor"));
+		return 0;
 	}
 	AActor* HitActor = HitRes.GetActor();
-
-
 	if (HitActor->Implements<UTraversalObjects>()) {
-		return true;
+		Height = FindHeightTargetActor(HitRes);	
 	}
+	return Height;
+}
 
-	return false;
+float ATraversalCharacter::FindHeightTargetActor(FHitResult HitRes) {
+	AActor* HitActor = HitRes.GetActor();
+	if (HitActor->Implements<UTraversalObjects>()) {
+		//== HeightPoint
+		FVector TargetLocation = HitActor->GetActorLocation();
+		const FVector ForwardVector = GetActorForwardVector();
+		const FVector StartPoint = HitRes.ImpactPoint+ForwardVector*15.0f;
+		const FVector EndPointToHeight = StartPoint + (FVector::UpVector * 500.0f);
+		FHitResult HitResHeight;
+		bool bHitH = GetWorld()->LineTraceSingleByChannel(HitResHeight, EndPointToHeight, StartPoint,  ECC_Visibility);
+		if (!bHitH) {
+			UE_LOG(LogTemp, Warning, TEXT("[TraversalCharacter] HitErrrUp"));
+			return 0;
+		}
+		const FVector HeightPoint = HitResHeight.ImpactPoint;
+
+		//==LowPoint
+		// two Methods legs of Player and low point in TraversalObjects, Maybe both methods
+		const FVector EndPointToLow = StartPoint + (FVector::DownVector * 500.0f);
+		FHitResult HitResLow;
+		bool bHitL =  GetWorld()->LineTraceSingleByChannel(HitResLow, EndPointToLow ,StartPoint, ECC_Visibility);
+		if (!bHitL) {
+			UE_LOG(LogTemp, Warning, TEXT("[TraversalCharacter] HitErrrDown"));
+			return 0;
+		}
+		const FVector LowPoint = HitResLow.ImpactPoint;
+		const float HeightObject=  FVector::Distance(HeightPoint, LowPoint);
+		UE_LOG(LogTemp, Warning, TEXT("HeightObject = %f"), HeightObject);
+
+		return HeightObject;
+	}
+	return 0;
 }
