@@ -7,8 +7,6 @@
 #include "Logging/LogMacros.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
-#include "GameAbilities/GA_Mantle.h"
-#include "GameAbilities/GA_Vault.h"
 #include "TraversalCharacter.generated.h"
 
 class USpringArmComponent;
@@ -48,8 +46,12 @@ class ATraversalCharacter : public ACharacter, public IAbilitySystemInterface
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* TraversalAction;
+
+
+	float Depth = 0;
 
 
 	
@@ -68,16 +70,16 @@ protected:
 
 	void Travers(const FInputActionValue& Value);
 
-	float FindTriversalObject();
+
+	void FindTriversalObject();
 	float FindHeightTargetActor(FHitResult HitResult);
+	float FindDepthTargetActor(FHitResult HitResult);
 			
 
 protected:
 
 	virtual void NotifyControllerChanged() override;
-
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 
@@ -91,14 +93,17 @@ public:
 	TSubclassOf<UGameplayAbility> MantleAbility;
 
 	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
-	float DistanceInputAction;
+	float DistanceInputAction = 250;
 	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
-	float DistanceActivateAbility;
+	float DistanceActivateAbility  = 150;
 	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
-	float HeightVaulting;
+	float MaxHeightVaulting = 160;
 	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
-	float HeightMantling;
+	float MaxDepthVaulting = 30;
+	UPROPERTY(EditDefaultsOnly, Category = "ParametrsTraversal")
+	float MaxHeightMantling = 260;
 
+	float Height = 0;
 
 
 	/** Returns CameraBoom subobject **/
@@ -107,9 +112,9 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	UFUNCTION(BlueprintCallable)
-	void Vault();
+	void Vaulting();
 	UFUNCTION(BlueprintCallable)
-	void Mantle();
+	void Mantling();
 
 
 };

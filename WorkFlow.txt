@@ -84,10 +84,14 @@ Will I be have time for interpolate animation?
 Check how many Ability can apply on this type objects from this interface
 ResetAnimation if player dont want go to top
 
++++MVP ready 13.09
+ 
+
 -----------------------------------------------------------------------------------------------------------------------------------
 Choose Practic:
-TraceLine and Hit Verified before (Another Available Box and Sphere Trace, I don't use before, Time, I saw Trace from Ability system maybe it will be work, but I think it for shoot)
-Implements verified before a many time (Another available Collision, OnlyParentClass, Tags, SetsOfData(it's cool very dynamic and usefull, but time))
+-TraceLine and Hit Verified before (Another Available Box and Sphere Trace, I don't use before, Time, I saw Trace from Ability system maybe it will be work, but I think it for shoot)
+-Implements verified before a many time (Another available Collision, OnlyParentClass, Tags, SetsOfData(it's cool very dynamic and usefull, but time))
+-SendParametrs. I use include(careful circular) , SendGameplayEventToActor (problem only 1 float param) +  GameplayEffectContext (Learn) or FnewCustomEventParam(best but over engine and learn) maybe Use another container some ActivationInfo and other
 
 
 -----------------------------------------------------------------------------------------------------------------------------------
@@ -107,7 +111,7 @@ Invariants
 -Use only 4 animations maybe I need transitional for flow
 
 ####Delegates
--Don't forgot EndPlay
+-Don't forgot EndPlay if you need
 -----------------------------------------------------------------------------------------------------------------------------------
 Arch
                 INPUT E ok
@@ -130,16 +134,16 @@ Arch
                          │
               ┌──────────┼───────────┐
               │          │           │
-           Height ok   TargetLocation  ...
+           Height ok   TargetLocation  
               │
               ▼
          Select Ability ok
           /           \
-     GA_Vault       GA_Mantle ok
+     GA_Vault  ok     GA_Mantle ok
          │              │
          └──────┬───────┘
                 │
-           Get Speed
+           Get Speed ok
                 │
                 ▼
          Select Animation ok
@@ -162,8 +166,14 @@ Travers(const FInputActionValue& Value) - function realize input "E"
 FindTriversalObject() - Used Trace for Find Objects, return true if actor implements TraversalObjets and activate Vault and Mantle
 FindHeightTargetActor(FHitResult HitRes) - finding HeightObject and return this
 Step3:
-void UGA_Mantle::ActivateAbility = created Montage for playAnimation. Animation is Work, But don't work Root  
+void UGA_Mantle::ActivateAbility = created Montage for playAnimation. 
 Fixed Root Motion. Z work too. All works make. Next I need to make extension and impruve 
+Step4: 
+FindDepthTargetActor(FHitResult HitRes) - DepthOfObject
+Travers(const FInputActionValue& Value) - full decide what GA strting
+GA_Vautl() is working
+GA_Mantl() is working
++++MVP ready 13.09
 
 -----------------------------------------------------------------------------------------------------------------------------------
 Edge
@@ -175,6 +185,9 @@ Edge
 -Check how many Ability can apply on this type objects from this interface
 -ResetAnimation if player dont want go to top
 ###InIMPL:
--has GAS server? If you try apply Abilities in BeginPlay in BP, It can apply firster that C++ code (strange but fact)  
+-If you try apply Abilities in BeginPlay in BP, It can apply firster that C++ code (strange but fact)  
 -Z need off Mode_Walking because CHaracter always snap on floor, apply Mode_Fly and return standart mode after animation
+-in Theory Finding parametrs Depth and Height can make not true result, for this really rare happens you can make additional check
+-You can use SendGameplayEventToActor for send some parameters and create FEventParam but it's need for learning. The same GameplayEffects, needs more time
++++
 
