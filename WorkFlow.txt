@@ -116,12 +116,10 @@ Invariants
 Arch
                 INPUT E ok
                      │
-                     ▼
               PRE-GA DETECTION
                      │
              Forward Trace ok
                      │
-                     ▼
               Hit Actor? ok
                 /       \
               No         Yes
@@ -129,14 +127,12 @@ Arch
          ok   return   Implements ok
                     Traversal Interface? ok
                          │
-                         ▼
                    GetTraversalData 
                          │
               ┌──────────┼───────────┐
               │          │           │
-           Height ok   TargetLocation  
+           Height ok   TargetLocation for MotionWarp 
               │
-              ▼
          Select Ability ok
           /           \
      GA_Vault  ok     GA_Mantle ok
@@ -145,16 +141,12 @@ Arch
                 │
            Get Speed ok
                 │
-                ▼
          Select Animation ok
                 │
-                ▼
           Play Montage ok
                 │
-                ▼
         Movement ok / MotionWarping / Root Motion ok
                 │
-                ▼
             EndAbility ok
 -----------------------------------------------------------------------------------------------------------------------------------
 IMPL
